@@ -29,8 +29,14 @@ Copy-Item .env.example .env
 ```
 DB_NAME=todo_db
 DB_USER=todo_user
-DB_PASSWORD=b4code
+DB_PASSWORD=your_secure_password_here
 ```
+
+**Password Requirements:**
+- Minimum 12 characters
+- Mix of uppercase, lowercase, numbers, special characters
+- Example: `T0d0@App2025Secure`
+- ❌ DO NOT use: b4code, password123, admin, 12345678
 
 3. **Use environment variables in application**
    - Spring Boot reads from `.env` or system variables
