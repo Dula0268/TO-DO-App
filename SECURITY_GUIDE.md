@@ -111,5 +111,5 @@ git push origin feature/db-setup-dulanga --force-with-lease
 ```
 
 But if it's in older commits, the password is still visible in history!
-Consider rotating the password to 'b4code2' or similar.
+Consider rotating the password to a strong value like 'T0d0@App2025Secure' or another password that meets the requirements above.
 
