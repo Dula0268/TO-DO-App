@@ -11,10 +11,10 @@ CREATE DATABASE todo_db;
 
 -- Step 2: Create User Role with Permissions
 -- ============================================================================
--- ⚠️ IMPORTANT: Replace 'your_secure_password_here' with actual password from .env
--- DO NOT hardcode passwords in version control!
--- Note: Connect to todo_db after creating it, then run the rest of this script
-CREATE USER todo_user WITH PASSWORD 'your_secure_password_here';
+-- ⚠️ IMPORTANT: Do NOT hardcode passwords in this file!
+-- Use psql variable substitution to securely pass the password:
+--   psql -v DB_PASSWORD=$DB_PASSWORD -f db/schema.sql
+CREATE USER todo_user WITH PASSWORD :'DB_PASSWORD';
 GRANT ALL PRIVILEGES ON DATABASE todo_db TO todo_user;
 
 -- Step 3: Connect to todo_db and Create Tables
