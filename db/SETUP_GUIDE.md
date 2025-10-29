@@ -24,11 +24,12 @@ Database Credentials
 
 Use these placeholders and replace with actual values from .env:
 
-Item     Value                    Notes
-Database todo_db                  Fixed name
-User     todo_user                Fixed name  
-Password ${DB_PASSWORD}           From your .env file
-Port     5432                     Default PostgreSQL port
+| Item     | Value           | Notes                    |
+|----------|-----------------|--------------------------|
+| Database | todo_db         | Fixed name               |
+| User     | todo_user       | Fixed name               |
+| Password | ${DB_PASSWORD}  | From your .env file      |
+| Port     | 5432            | Default PostgreSQL port  |
 
 
 Verify Setup
