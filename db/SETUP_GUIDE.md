@@ -2,10 +2,7 @@ DATABASE SETUP GUIDE
 
 SECURITY FIRST
 
-
-
-
-
+For security best practices and guidance, please refer to SECURITY_GUIDE.md.
 Prerequisites
 - PostgreSQL installed on your machine
 - PostgreSQL running (default port: 5432)
