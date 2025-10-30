@@ -14,7 +14,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 5000,
+  timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 5000,
 });
 
 // Add JWT token to every request
