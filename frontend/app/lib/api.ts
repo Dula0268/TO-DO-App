@@ -2,6 +2,13 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+// ✅ FIX: Define proper types
+interface TodoPayload {
+  title: string;
+  description?: string;
+  completed?: boolean;
+}
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -55,7 +62,8 @@ export const addTodo = (title: string, description: string = '') => {
   return api.post('/api/todos', { title, description, completed: false });
 };
 
-export const updateTodo = (id: number, todo: any) => {
+// ✅ FIX: Use proper type instead of 'any'
+export const updateTodo = (id: number, todo: Partial<TodoPayload>) => {
   return api.put(`/api/todos/${id}`, todo);
 };
 

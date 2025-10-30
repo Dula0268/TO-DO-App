@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { addTodo, updateTodo } from '@/app/lib/api';
 
 interface Todo {
@@ -21,10 +21,21 @@ export default function TodoForm({
   editingTodo,
   onEditComplete,
 }: TodoFormProps) {
-  const [title, setTitle] = useState(editingTodo?.title || '');
-  const [description, setDescription] = useState(editingTodo?.description || '');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // ✅ FIX: Update form when editingTodo changes
+  useEffect(() => {
+    if (editingTodo) {
+      setTitle(editingTodo.title);
+      setDescription(editingTodo.description);
+    } else {
+      setTitle('');
+      setDescription('');
+    }
+  }, [editingTodo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +106,15 @@ export default function TodoForm({
         >
           {loading ? 'Saving...' : editingTodo?.id ? 'Update Todo' : 'Add Todo'}
         </button>
+        {editingTodo?.id && (
+          <button
+            type="button"
+            onClick={onEditComplete}
+            className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition"
+          >
+            Cancel
+          </button>
+        )}
       </div>
     </form>
   );

@@ -24,7 +24,8 @@ export default function LoginPage() {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      router.push('/todos');
+      // ✅ FIX: Redirect to / instead of /todos
+      router.push('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
