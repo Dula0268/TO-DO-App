@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BackendApplication.class, args);
-        System.out.println("🚀 ToDo App Backend is running on port 8080!");
+        var context = SpringApplication.run(BackendApplication.class, args);
+        String port = context.getEnvironment().getProperty("server.port", "8080");
+        System.out.println("🚀 ToDo App Backend is running on port " + port + "!");
     }
+
 }
