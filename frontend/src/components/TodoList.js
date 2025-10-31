@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { todoAPI } from '../services/api';
+// todoAPI import removed since we're using mock data for now
 
 export default function TodoList() {
   const [todos, setTodos] = useState([
@@ -9,7 +9,7 @@ export default function TodoList() {
     { id: 3, title: 'Deploy Project', description: 'Deploy to production', status: 'PENDING', createdAt: '2024-01-16' }
   ]);
 
-    // DELETE FUNCTIONALITY - YOUR MAIN TASK
+  // DELETE FUNCTIONALITY - YOUR MAIN TASK
   const handleDelete = async (todoId) => {
     // Confirmation popup
     if (!window.confirm('Are you sure you want to delete this todo?')) {
@@ -20,15 +20,15 @@ export default function TodoList() {
       // MOCK SUCCESS - Remove this when backend is ready
       console.log('Mock delete called for todo:', todoId);
       
-      // Update UI without refresh
-      setTodos(todos.filter(todo => todo.id !== todoId));
+      // Update UI without refresh - FIXED: using functional update
+      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== todoId));
       
       // Success notification
       alert('✅ Todo deleted successfully!');
       
       // UNCOMMENT THIS WHEN BACKEND IS READY:
       // await todoAPI.deleteTodo(todoId);
-      // setTodos(todos.filter(todo => todo.id !== todoId));
+      // setTodos(prevTodos => prevTodos.filter(todo => todo.id !== todoId));
       // alert('✅ Todo deleted successfully!');
       
     } catch (error) {
