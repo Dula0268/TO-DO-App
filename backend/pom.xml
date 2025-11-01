@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -84,11 +84,16 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- Flyway for database migrations -->
+		<!-- Flyway for database migrations: upgrade to 11.x and include Postgres plugin -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>10.5.0</version>
+			<version>11.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<version>11.0.0</version>
 		</dependency>
 	</dependencies>
 

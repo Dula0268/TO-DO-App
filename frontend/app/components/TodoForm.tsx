@@ -1,14 +1,9 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { addTodo, updateTodo } from '@/app/lib/api';
-
-interface Todo {
-  id?: number;
-  title: string;
-  description: string;
-  completed?: boolean;
-}
+import toast from 'react-hot-toast';
+import type { Todo } from '@/types/todo';
 
 interface TodoFormProps {
   onTodoAdded: () => void;
@@ -42,18 +37,36 @@ export default function TodoForm({
     setError('');
     setLoading(true);
 
+    // Client-side validation
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setError('Title is required');
+      toast.error('Please provide a title for the todo');
+      setLoading(false);
+      return;
+    }
+    if (trimmedTitle.length < 3) {
+      setError('Title must be at least 3 characters');
+      toast.error('Title must be at least 3 characters');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (editingTodo?.id) {
         await updateTodo(editingTodo.id, { title, description });
         onEditComplete();
+        toast.success('Todo updated');
       } else {
         await addTodo(title, description);
         setTitle('');
         setDescription('');
+        toast.success('Todo added');
       }
       onTodoAdded();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save todo');
+      toast.error(err.response?.data?.message || 'Failed to save todo');
     } finally {
       setLoading(false);
     }

@@ -34,3 +34,6 @@ coverage/
 
 # Misc
 .cache
+
+# Local PR body file (drafts)
+PR_BODY.md

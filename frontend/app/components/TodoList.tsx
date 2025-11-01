@@ -1,14 +1,8 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { deleteTodo, toggleTodo } from '@/app/lib/api';
-
-interface Todo {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import type { Todo } from '@/types/todo';
 
 interface TodoListProps {
   todos: Todo[];

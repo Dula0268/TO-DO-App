@@ -1,18 +1,21 @@
 "use client";
 import React, { useState } from "react";
-import api from "@/app/lib/api"; // or import axios directly
+import api, { login } from "@/app/lib/api"; // use shared login helper
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [username, setUsername] = useState(""); // or email
+  const [email, setEmail] = useState(""); // this field holds the user's email
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{username?:string,password?:string}>({});
+  const [errors, setErrors] = useState<{email?:string,password?:string}>({});
 
   function validate() {
     const e: any = {};
-    if (!username.trim()) e.username = "Username/email is required";
+    if (!email.trim()) e.email = "Email is required";
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) e.email = "A valid email address is required";
     if (!password) e.password = "Password is required";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -22,15 +25,16 @@ export default function LoginForm() {
     ev.preventDefault();
     if (!validate()) return;
     try {
-      const toastId = toast.loading("Logging in...");
-      const res = await api.post("/auth/login", { username, password });
+  const toastId = toast.loading("Logging in...");
+  // Use the centralized login helper which stores the token correctly
+  const res = await login(email, password);
       toast.dismiss(toastId);
-      const token = res.data?.token ?? res.data?.accessToken;
+      // api.login stores token in localStorage; still check for accessToken
+      const token = res?.accessToken ?? res?.token ?? localStorage.getItem('token');
       if (!token) {
         toast.error("No token returned by server");
         return;
       }
-      localStorage.setItem("token", token);
       toast.success("Logged in");
       router.push("/todos");
     } catch (err:any) {
@@ -45,18 +49,18 @@ export default function LoginForm() {
       <div className="rounded-md shadow-sm -space-y-px">
         <div className="mb-4">
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-            Username or Email
+            Email
           </label>
           <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            id="email"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Enter your username or email"
+            placeholder="Enter your email"
           />
-          {errors.username && (
-            <p className="mt-2 text-sm text-red-600">{errors.username}</p>
+          {errors.email && (
+            <p className="mt-2 text-sm text-red-600">{errors.email}</p>
           )}
         </div>
         <div className="mb-4">
