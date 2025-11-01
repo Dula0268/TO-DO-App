@@ -6,12 +6,14 @@ import Navbar from '@/app/components/Navbar';
 import { getTodos } from '@/app/lib/api';
 import type { Todo } from '@/types/todo';
 import TodoList from '@/app/components/TodoList';
+import TodoForm from '@/app/components/TodoForm';
 
 export default function TodosPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
 
   const fetchTodos = async () => {
     setLoading(true);
@@ -19,8 +21,9 @@ export default function TodosPage() {
     try {
       // `getTodos()` returns an Axios response object. Extract `.data`
       const resp: any = await getTodos();
-      const data = resp?.data ?? resp;
-      setTodos(Array.isArray(data) ? data : []);
+  const data = resp?.data ?? resp;
+  setTodos(Array.isArray(data) ? data : []);
+  setLastFetchedAt(new Date().toLocaleString());
     } catch (err: any) {
       console.error('Failed to fetch todos:', err);
       const status = err?.response?.status;
@@ -70,6 +73,12 @@ export default function TodosPage() {
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-800 mb-8">My Todos</h1>
+
+          <TodoForm
+            onTodoAdded={handleTodoAdded}
+            editingTodo={editingTodo}
+            onEditComplete={() => setEditingTodo(null)}
+          />
 
           {error && !loading && (
             <div className="bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-6 border border-yellow-300">
