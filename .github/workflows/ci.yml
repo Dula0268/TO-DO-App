@@ -39,9 +39,13 @@ jobs:
           POSTGRES_DB: todo_db
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd='pg_isready -U todo_user -d todo_db'
-          --health-interval=5s --health-timeout=5s --health-retries=10
+        # Use the native healthcheck mapping so Docker receives pg_isready args
+        # as the command (prevents the runner from mis-parsing -U as a Docker flag).
+        healthcheck:
+          test: ["CMD", "pg_isready", "-U", "todo_user", "-d", "todo_db"]
+          interval: 10s
+          timeout: 5s
+          retries: 10
 
     steps:
       - name: Checkout
