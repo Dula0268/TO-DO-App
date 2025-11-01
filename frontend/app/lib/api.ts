@@ -47,7 +47,11 @@ api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
-      if (token) {
+      const url = (config.url || "").toString();
+      // Don't attach Authorization header to auth endpoints (login/register)
+      // This prevents sending a stale token during login and keeps responses
+      // clean for client-side logic that expects the server to return the token.
+      if (token && !url.startsWith('/api/auth/')) {
         config.headers = setAuthHeader(config.headers, token);
       }
     }
@@ -124,5 +128,6 @@ export async function toggleTodo(id: number, completed: boolean): Promise<Todo> 
 export async function deleteTodo(id: number): Promise<void> {
   await api.delete(`/api/todos/${id}`);
 }
+
 
 export default api;
