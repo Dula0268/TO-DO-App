@@ -1,0 +1,39 @@
+# Start mvnw detached and probe backend endpoints for health and /api/todos
+Set-Location "$PSScriptRoot\.."
+
+if (Test-Path '.\\mvnw.cmd') {
+    Start-Process -FilePath '.\\mvnw.cmd' -ArgumentList 'spring-boot:run' -WorkingDirectory (Get-Location) -WindowStyle Hidden
+    Write-Output 'Started detached mvnw.cmd (spring-boot:run)'
+} elseif (Test-Path '.\\mvnw') {
+    Start-Process -FilePath '.\\mvnw' -ArgumentList 'spring-boot:run' -WorkingDirectory (Get-Location) -WindowStyle Hidden
+    Write-Output 'Started detached mvnw (spring-boot:run)'
+} else {
+    Write-Error 'mvnw not found'
+    exit 1
+}
+
+Start-Sleep -Seconds 6
+
+try {
+    $h = Invoke-RestMethod -Uri 'http://localhost:8080/actuator/health' -UseBasicParsing -TimeoutSec 5
+    Write-Output "HEALTH_OK: $($h.status)"
+} catch {
+    Write-Output "HEALTH_ERROR: $($_.Exception.Message)"
+}
+
+try {
+    $r = Invoke-WebRequest -Uri 'http://localhost:8080/api/todos' -UseBasicParsing -Method GET -Headers @{ Accept='application/json' } -TimeoutSec 10
+    Write-Output "TODOS_STATUS: $($r.StatusCode)"
+    Write-Output "TODOS_BODY: $($r.Content)"
+} catch {
+    $err = $_.Exception
+    $resp = $err.Response
+    if ($resp -ne $null) {
+        $status = $resp.StatusCode.Value__
+        $body = (New-Object System.IO.StreamReader($resp.GetResponseStream())).ReadToEnd()
+        Write-Output "TODOS_ERROR_STATUS: $status"
+        Write-Output "TODOS_ERROR_BODY: $body"
+    } else {
+        Write-Output "TODOS_ERROR: $($err.Message)"
+    }
+}
