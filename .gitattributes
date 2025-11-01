@@ -1,0 +1,2 @@
+# Ensure the Maven wrapper uses LF endings on all platforms
+mvnw text eol=lf

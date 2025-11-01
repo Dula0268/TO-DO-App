@@ -1,51 +1,64 @@
 package com.todoapp.backend.controller;
 
+import com.todoapp.backend.model.User;
+import com.todoapp.backend.security.JwtUtil;
+import com.todoapp.backend.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
-    // Simple in-memory user store for local development only
-    private static final Map<String, UserRecord> USERS = new ConcurrentHashMap<>();
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    public AuthController(UserService userService, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest req) {
-        if (req == null || req.email == null) {
-            return ResponseEntity.badRequest().body(new AuthResponse(null, null, "Invalid request"));
+        if (req == null || req.email == null || req.password == null) {
+            return ResponseEntity.badRequest().body(new AuthResponse(null, "Invalid request"));
         }
-        if (USERS.containsKey(req.email)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new AuthResponse(null, null, "User already exists"));
+        try {
+            User u = userService.register(req.name, req.email, req.password);
+            String token = jwtUtil.generateToken(u.getEmail());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, "Registered"));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse(null, ex.getMessage()));
         }
-        USERS.put(req.email, new UserRecord(req.name, req.email, req.password));
-        String token = "dev-token-" + UUID.randomUUID();
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new AuthResponse(token, token, "Registered"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
-        if (req == null || req.email == null) {
-            return ResponseEntity.badRequest().body(new AuthResponse(null, null, "Invalid request"));
+        if (req == null || req.email == null || req.password == null) {
+            return ResponseEntity.badRequest().body(new AuthResponse(null, "Invalid request"));
         }
-        UserRecord u = USERS.get(req.email);
-        if (u == null || (u.password != null && !u.password.equals(req.password))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse(null, null, "Invalid credentials"));
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.email, req.password)
+            );
+            String token = jwtUtil.generateToken(auth.getName());
+            return ResponseEntity.ok(new AuthResponse(token, "OK"));
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid credentials"));
         }
-        String token = "dev-token-" + UUID.randomUUID();
-        return ResponseEntity.ok(new AuthResponse(token, token, "OK"));
     }
 
-    // --- DTOs / simple records ---
+    // DTOs
     public static class RegisterRequest {
         public String name;
         public String email;
@@ -58,26 +71,12 @@ public class AuthController {
     }
 
     public static class AuthResponse {
-        public String token;
         public String accessToken;
         public String message;
 
-        public AuthResponse(String token, String accessToken, String message) {
-            this.token = token;
+        public AuthResponse(String accessToken, String message) {
             this.accessToken = accessToken;
             this.message = message;
-        }
-    }
-
-    private static class UserRecord {
-        public final String name;
-        public final String email;
-        public final String password;
-
-        public UserRecord(String name, String email, String password) {
-            this.name = name;
-            this.email = email;
-            this.password = password;
         }
     }
 }
