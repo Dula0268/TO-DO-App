@@ -1,14 +1,8 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { addTodo, updateTodo } from '@/app/lib/api';
-
-interface Todo {
-  id?: number;
-  title: string;
-  description: string;
-  completed?: boolean;
-}
+import type { Todo } from '@/types/todo';
 
 interface TodoFormProps {
   onTodoAdded: () => void;

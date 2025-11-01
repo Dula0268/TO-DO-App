@@ -20,11 +20,11 @@ jobs:
 
       - name: Build & run tests (test profile)
         working-directory: backend
+        env:
+          MAVEN_OPTS: -Xmx1g
         run: |
           chmod +x ./mvnw
           ./mvnw -B -Dspring.profiles.active=test test
-        env:
-          MAVEN_OPTS: -Xmx1g
 
   integration-postgres:
     name: Integration tests (Postgres service)
@@ -39,13 +39,6 @@ jobs:
           POSTGRES_DB: todo_db
         ports:
           - 5432:5432
-        # Use the native healthcheck mapping so Docker receives pg_isready args
-        # as the command (prevents the runner from mis-parsing -U as a Docker flag).
-        healthcheck:
-          test: ["CMD", "pg_isready", "-U", "todo_user", "-d", "todo_db"]
-          interval: 10s
-          timeout: 5s
-          retries: 10
 
     steps:
       - name: Checkout
@@ -58,19 +51,24 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Wait for Postgres to be ready
+      - name: Wait for Postgres to be ready (pg_isready)
         run: |
-          echo "Waiting for Postgres..."
-          sleep 15
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U todo_user && break
+            echo "Waiting for Postgres... ($i/30)"; sleep 2
+          done
+          pg_isready -h localhost -p 5432 -U todo_user
 
       - name: Run tests against Postgres
+        working-directory: backend
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/todo_db
           SPRING_DATASOURCE_USERNAME: todo_user
           SPRING_DATASOURCE_PASSWORD: todo_password
           SPRING_FLYWAY_ENABLED: 'true'
           MAVEN_OPTS: -Xmx1g
-        working-directory: backend
         run: |
           chmod +x ./mvnw
           ./mvnw -B test
