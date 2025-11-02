@@ -1,12 +1,126 @@
 # To-Do Application
 
 ## Structure
-- `frontend` → Next.js app
-- `backend` → Spring Boot app
-- `db` → PostgreSQL scripts (tables, seed data)
 
 ## Quick start (recommended)
 Follow these steps to run the app locally (PowerShell examples provided):
+# TO-DO App
+
+A simple full-stack To-Do application with a Next.js (frontend) client and a Spring Boot (Java) backend.
+
+This repository contains a small, pragmatic example for building a secure CRUD app with JWT authentication, a Postgres-backed backend, and a modern React/Next frontend.
+
+---
+
+## 📁 Project Structure
+
+```
+/TO-DO-App
+├── backend        # Spring Boot backend (Java, Maven, Spring Security, Flyway)
+├── frontend       # Next.js frontend (TypeScript, Axios, Tailwind)
+├── db             # example SQL files and schema
+├── README.md      # (this file)
+```
+
+---
+
+## 🚀 Getting started (developer flow)
+
+You can run the backend and frontend separately. The frontend talks to the backend API (by default http://localhost:8080).
+
+Prerequisites
+
+* Java 21
+* Maven (or use the included Maven wrapper)
+* Node.js (v18+ recommended)
+* PostgreSQL (or run via Docker)
+
+Quick start (PowerShell)
+
+```powershell
+# start backend (from /backend)
+cd backend
+# use the provided helper script which loads backend/.env and runs the app
+powershell -ExecutionPolicy Bypass -File .\start-backend.ps1
+
+# in a separate terminal: start frontend (from /frontend)
+cd frontend
+npm install
+$env:NEXT_PUBLIC_API_URL = "http://localhost:8080"; npm run dev
+```
+
+Or on macOS/Linux:
+
+```bash
+# backend
+cd backend
+./mvnw spring-boot:run
+
+# frontend
+cd frontend
+npm install
+NEXT_PUBLIC_API_URL=http://localhost:8080 npm run dev
+```
+
+Open the frontend at http://localhost:3000 and the backend will be available at http://localhost:8080.
+
+---
+
+## 🧩 Features
+
+* User registration & login (JWT)
+* Create, read, update, delete personal todos
+* Protected API endpoints (only accessible with a valid token)
+* Flyway database migrations for schema
+* Tailwind-based responsive UI
+
+---
+
+## 🧭 Where to look
+
+* Backend code: `backend/src/main/java/com/todoapp/backend`
+* Frontend code: `frontend/app` (Next.js app directory)
+* DB migrations: `backend/src/main/resources/db/migration`
+* Backend setup guide: `backend/SETUP_BACKEND.md`
+
+---
+
+## 🛠️ Scripts
+
+Backend (from `backend`):
+
+```powershell
+# run app using Maven wrapper
+./mvnw spring-boot:run
+# run tests
+./mvnw test
+```
+
+Frontend (from `frontend`):
+
+```powershell
+npm install
+npm run dev      # start Next.js dev server
+npm run build    # build for production
+npm run start    # start production server after build
+```
+
+---
+
+## ✅ Contributing
+
+Contributions welcome. Please create a branch off `main` for each feature/fix and open a PR with a descriptive title. Run tests and ensure linters pass before requesting review.
+
+---
+
+## ⚠ Notes
+
+* Do not commit `.env` files with secrets. Use `.env.example` as a template.
+* For CI reliability consider using Testcontainers for DB-dependent tests instead of local DB or shared instances.
+
+---
+
+If you want, I can also add a short README in each subfolder (backend/frontend) with focused, step-by-step instructions — I already prepared `frontend/README.md` and `backend/README.md` updates in this branch.
 
 1. Clone the repo and open the workspace
 
