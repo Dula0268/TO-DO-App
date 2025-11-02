@@ -19,12 +19,19 @@ export default function LoginPage() {
 
     try {
       const response = await login(email, password);
-      const { token, user } = response.data;
+      // `login()` returns the parsed response body (not an AxiosResponse).
+      // The backend returns { accessToken, message }.
+      const token = response?.accessToken ?? response?.token ?? localStorage.getItem('token');
+      const user = response?.user ?? null;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
 
-      // ✅ FIX: Redirect to / instead of /todos
+      // Redirect to home after successful login
       router.push('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
