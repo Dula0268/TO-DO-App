@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PrivateRoute from '@/app/components/PrivateRoute';
 import Navbar from '@/app/components/Navbar';
 import { getTodos } from '@/app/lib/api';
-import type { Todo } from '@/types/todo';
+import type { Todo, Priority } from '@/types/todo';
 import TodoList from '@/app/components/TodoList';
 import TodoForm from '@/app/components/TodoForm';
 
@@ -14,6 +14,10 @@ export default function TodosPage() {
   const [error, setError] = useState('');
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
+  
+  // Filter states
+  const [priorityFilter, setPriorityFilter] = useState<'ALL' | Priority>('ALL');
+  const [completedFilter, setCompletedFilter] = useState<'ALL' | 'COMPLETED' | 'PENDING'>('ALL');
 
   const fetchTodos = async () => {
     setLoading(true);
@@ -67,6 +71,24 @@ export default function TodosPage() {
     }
   };
 
+  // Filter todos based on selected filters
+  const filteredTodos = todos.filter((todo) => {
+    // Priority filter
+    if (priorityFilter !== 'ALL' && todo.priority !== priorityFilter) {
+      return false;
+    }
+    
+    // Completed filter
+    if (completedFilter === 'COMPLETED' && !todo.completed) {
+      return false;
+    }
+    if (completedFilter === 'PENDING' && todo.completed) {
+      return false;
+    }
+    
+    return true;
+  });
+
   return (
     <PrivateRoute>
       <Navbar />
@@ -94,6 +116,68 @@ export default function TodosPage() {
 
           {error && <div className="mb-4 text-red-600">{error}</div>}
 
+          {/* Filter Controls */}
+          {!loading && todos.length > 0 && (
+            <div className="bg-white p-4 rounded-lg shadow mb-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">🔍 Filters</h3>
+              <div className="flex flex-wrap gap-4">
+                {/* Priority Filter */}
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Priority
+                  </label>
+                  <select
+                    value={priorityFilter}
+                    onChange={(e) => setPriorityFilter(e.target.value as 'ALL' | Priority)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="ALL">All Priorities</option>
+                    <option value="HIGH">🔴 High</option>
+                    <option value="MEDIUM">🟡 Medium</option>
+                    <option value="LOW">🟢 Low</option>
+                  </select>
+                </div>
+
+                {/* Completed Filter */}
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={completedFilter}
+                    onChange={(e) => setCompletedFilter(e.target.value as 'ALL' | 'COMPLETED' | 'PENDING')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="ALL">All Status</option>
+                    <option value="PENDING">⏳ Pending</option>
+                    <option value="COMPLETED">✅ Completed</option>
+                  </select>
+                </div>
+
+                {/* Reset Filters Button */}
+                {(priorityFilter !== 'ALL' || completedFilter !== 'ALL') && (
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setPriorityFilter('ALL');
+                        setCompletedFilter('ALL');
+                      }}
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-md transition"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Filter Results Summary */}
+              <div className="mt-3 text-xs text-gray-500">
+                Showing <span className="font-semibold text-gray-700">{filteredTodos.length}</span> of{' '}
+                <span className="font-semibold text-gray-700">{todos.length}</span> todos
+              </div>
+            </div>
+          )}
+
           {loading && (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
@@ -103,7 +187,7 @@ export default function TodosPage() {
 
           {!loading && (
             <TodoList
-              todos={todos}
+              todos={filteredTodos}
               onTodoDeleted={handleTodoAdded}
               onEditClick={handleEditClick}
               loading={loading}
