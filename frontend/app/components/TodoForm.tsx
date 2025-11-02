@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { addTodo, updateTodo } from '@/app/lib/api';
-import toast from 'react-hot-toast';
 import type { Todo } from '@/types/todo';
+import { useToast } from '@/app/hooks/useToast'; // ADD THIS IMPORT
 
 interface TodoFormProps {
   onTodoAdded: () => void;
@@ -20,6 +20,7 @@ export default function TodoForm({
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { addToast } = useToast(); // ADD THIS
 
   // ✅ FIX: Update form when editingTodo changes
   useEffect(() => {
@@ -41,13 +42,13 @@ export default function TodoForm({
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       setError('Title is required');
-      toast.error('Please provide a title for the todo');
+      addToast('Please provide a title for the todo', 'error'); // UPDATED
       setLoading(false);
       return;
     }
     if (trimmedTitle.length < 3) {
       setError('Title must be at least 3 characters');
-      toast.error('Title must be at least 3 characters');
+      addToast('Title must be at least 3 characters', 'error'); // UPDATED
       setLoading(false);
       return;
     }
@@ -56,17 +57,18 @@ export default function TodoForm({
       if (editingTodo?.id) {
         await updateTodo(editingTodo.id, { title, description });
         onEditComplete();
-        toast.success('Todo updated');
+        addToast('Todo updated successfully!', 'success'); // UPDATED
       } else {
         await addTodo(title, description);
         setTitle('');
         setDescription('');
-        toast.success('Todo added');
+        addToast('Todo added successfully!', 'success'); // UPDATED
       }
       onTodoAdded();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save todo');
-      toast.error(err.response?.data?.message || 'Failed to save todo');
+      const errorMessage = err.response?.data?.message || 'Failed to save todo';
+      setError(errorMessage);
+      addToast(errorMessage, 'error'); // UPDATED
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,3 @@
-import TodoList from '../src/components/TodoList';
 'use client';
 
 import { useEffect } from 'react';
