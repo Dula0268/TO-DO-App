@@ -18,6 +18,7 @@ export default function TodoForm({
 }: TodoFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH'>('MEDIUM');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,9 +27,11 @@ export default function TodoForm({
     if (editingTodo) {
       setTitle(editingTodo.title);
       setDescription(editingTodo.description);
+      setPriority(editingTodo.priority || 'MEDIUM');
     } else {
       setTitle('');
       setDescription('');
+      setPriority('MEDIUM');
     }
   }, [editingTodo]);
 
@@ -54,13 +57,14 @@ export default function TodoForm({
 
     try {
       if (editingTodo?.id) {
-        await updateTodo(editingTodo.id, { title, description });
+        await updateTodo(editingTodo.id, { title, description, priority });
         onEditComplete();
         toast.success('Todo updated');
       } else {
-        await addTodo(title, description);
+        await addTodo(title, description, priority);
         setTitle('');
         setDescription('');
+        setPriority('MEDIUM');
         toast.success('Todo added');
       }
       onTodoAdded();
@@ -109,6 +113,21 @@ export default function TodoForm({
           rows={3}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
         />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 font-semibold mb-2">
+          Priority <span className="text-red-500">*</span>
+        </label>
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH')}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white"
+        >
+          <option value="LOW">🟢 Low</option>
+          <option value="MEDIUM">🟡 Medium</option>
+          <option value="HIGH">🔴 High</option>
+        </select>
       </div>
 
       <div className="flex gap-2">

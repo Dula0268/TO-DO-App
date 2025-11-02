@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { deleteTodo, toggleTodo } from '@/app/lib/api';
-import type { Todo } from '@/types/todo';
+import type { Todo, Priority } from '@/types/todo';
 
 interface TodoListProps {
   todos: Todo[];
@@ -10,6 +10,41 @@ interface TodoListProps {
   onEditClick: (todo: Todo) => void;
   loading: boolean;
 }
+
+// Helper function to render priority badge with colored labels
+const PriorityBadge = ({ priority }: { priority: Priority }) => {
+  const styles = {
+    LOW: {
+      bg: 'bg-green-100',
+      text: 'text-green-800',
+      border: 'border-green-300',
+      emoji: '🟢'
+    },
+    MEDIUM: {
+      bg: 'bg-yellow-100',
+      text: 'text-yellow-800',
+      border: 'border-yellow-300',
+      emoji: '🟡'
+    },
+    HIGH: {
+      bg: 'bg-red-100',
+      text: 'text-red-800',
+      border: 'border-red-300',
+      emoji: '🔴'
+    }
+  };
+
+  const style = styles[priority] || styles.MEDIUM;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style.bg} ${style.text} ${style.border}`}
+    >
+      <span>{style.emoji}</span>
+      <span>{priority}</span>
+    </span>
+  );
+};
 
 export default function TodoList({
   todos,

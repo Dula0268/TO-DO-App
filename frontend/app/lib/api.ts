@@ -1,10 +1,12 @@
 import axios, { AxiosError } from "axios";
+import type { Priority } from "@/types/todo";
 
 /** ---- Types ---- */
 export interface TodoPayload {
   title: string;
   description?: string;
   completed?: boolean;
+  priority?: Priority;
 }
 
 export interface Todo extends TodoPayload {
@@ -109,8 +111,8 @@ export async function getTodos(): Promise<Todo[]> {
   return data;
 }
 
-export async function addTodo(title: string, description = ""): Promise<Todo> {
-  const payload: TodoPayload = { title, description, completed: false };
+export async function addTodo(title: string, description = "", priority: Priority = 'MEDIUM'): Promise<Todo> {
+  const payload: TodoPayload = { title, description, completed: false, priority };
   const { data } = await api.post<Todo>("/api/todos", payload);
   return data;
 }
