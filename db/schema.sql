@@ -40,9 +40,25 @@ CREATE TABLE IF NOT EXISTS todos (
     description TEXT,
     completed   BOOLEAN NOT NULL DEFAULT FALSE,
     user_id     INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    priority    VARCHAR(16) NOT NULL DEFAULT 'MEDIUM',
+    category    VARCHAR(64),
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add priority and category columns if table already exists (migration for existing DBs)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                 WHERE table_name = 'todos' AND column_name = 'priority') THEN
+    ALTER TABLE todos ADD COLUMN priority VARCHAR(16) NOT NULL DEFAULT 'MEDIUM';
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                 WHERE table_name = 'todos' AND column_name = 'category') THEN
+    ALTER TABLE todos ADD COLUMN category VARCHAR(64);
+  END IF;
+END$$;
 
 -- 5) “updated_at” auto-refresh trigger (create only if missing)
 CREATE OR REPLACE FUNCTION public.set_updated_at()
@@ -67,6 +83,8 @@ END$$;
 CREATE INDEX IF NOT EXISTS idx_todos_user_id     ON todos(user_id);
 CREATE INDEX IF NOT EXISTS idx_todos_completed   ON todos(completed);
 CREATE INDEX IF NOT EXISTS idx_todos_created_at  ON todos(created_at);
+CREATE INDEX IF NOT EXISTS idx_todos_priority    ON todos(priority);
+CREATE INDEX IF NOT EXISTS idx_todos_category    ON todos(category);
 
 -- 7) Permissions for application user
 GRANT CONNECT ON DATABASE todo_db TO todo_user;
