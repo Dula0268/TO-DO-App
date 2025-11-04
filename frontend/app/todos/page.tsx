@@ -1,5 +1,7 @@
 "use client";
 
+import TodoSkeleton from "@/components/TodoSkeleton";
+
 import { useEffect, useState } from 'react';
 import PrivateRoute from '@/app/components/PrivateRoute';
 import Navbar from '@/app/components/Navbar';
@@ -179,11 +181,13 @@ export default function TodosPage() {
           )}
 
           {loading && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-              <p className="mt-4 text-gray-600">Loading todos...</p>
+            <div className="space-y-4">
+            <TodoSkeleton />
+            <TodoSkeleton />
+            <TodoSkeleton />
             </div>
-          )}
+      )}
+
 
           {!loading && (
             <TodoList
