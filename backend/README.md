@@ -41,7 +41,7 @@ Or on macOS/Linux:
 
 ```bash
 cd backend
-cp .env.example .env
+cp .env
 ./mvnw spring-boot:run
 ```
 
