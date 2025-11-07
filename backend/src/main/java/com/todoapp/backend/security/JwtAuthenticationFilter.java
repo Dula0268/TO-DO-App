@@ -1,6 +1,6 @@
 package com.todoapp.backend.security;
-
 import com.todoapp.backend.service.UserService;
+import com.todoapp.backend.security.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import com.todoapp.backend.security.JwtUtil;
 
 /**
  * JWT Authentication Filter that intercepts HTTP requests and validates JWT tokens.
