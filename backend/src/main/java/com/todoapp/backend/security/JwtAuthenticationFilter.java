@@ -1,5 +1,4 @@
 package com.todoapp.backend.security;
-
 import com.todoapp.backend.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

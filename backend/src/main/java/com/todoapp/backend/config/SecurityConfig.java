@@ -75,9 +75,9 @@ public class SecurityConfig {
      * @return AuthenticationManager instance
      * @throws Exception if authentication manager cannot be created
      */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        logger.info("Initializing AuthenticationManager");
+    @Bean(name = "authenticationManager")
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
+        logger.info("Initializing AuthenticationManager bean");
         return configuration.getAuthenticationManager();
     }
 
