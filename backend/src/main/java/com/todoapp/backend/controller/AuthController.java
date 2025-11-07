@@ -74,7 +74,17 @@ public class AuthController {
         }
         // Optionally return subject (email) to the client
         String subject = jwtUtil.getSubject(token);
-        return ResponseEntity.ok(new VerifyResponse(subject));
+        // Try to look up the user by email and return the stored name when available
+        String name = null;
+        try {
+            var userOpt = userService.findByEmail(subject);
+            if (userOpt.isPresent()) {
+                name = userOpt.get().getName();
+            }
+        } catch (Exception e) {
+            // ignore and return subject only
+        }
+        return ResponseEntity.ok(new VerifyResponse(subject, name));
     }
 
     // DTOs
@@ -101,9 +111,11 @@ public class AuthController {
 
     public static class VerifyResponse {
         public String subject;
+        public String name;
 
-        public VerifyResponse(String subject) {
+        public VerifyResponse(String subject, String name) {
             this.subject = subject;
+            this.name = name;
         }
     }
 }
