@@ -21,11 +21,11 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    @Value("${JWT_SECRET:change_me_use_env_var_with_32_chars}")
-    private String jwtSecret;
+@Value("${app.jwt.secret}")
+private String jwtSecret;
 
-    @Value("${JWT_EXPIRATION:3600000}") // Default: 1 hour
-    private long jwtExpirationMs;
+@Value("${app.jwt.expiration-seconds:3600}")
+private long jwtExpirationSeconds;
 
     /**
      * Generate signing key from secret
@@ -41,7 +41,8 @@ public class JwtUtil {
      */
     public String generateToken(String subject) {
         Date now = new Date();
-        Date exp = new Date(now.getTime() + jwtExpirationMs);
+        Date exp = new Date(now.getTime() + jwtExpirationSeconds * 1000L);
+
         
         return Jwts.builder()
                 .setSubject(subject)
@@ -59,7 +60,8 @@ public class JwtUtil {
      */
     public String generateTokenWithClaims(String subject, Map<String, Object> claims) {
         Date now = new Date();
-        Date exp = new Date(now.getTime() + jwtExpirationMs);
+        Date exp = new Date(now.getTime() + jwtExpirationSeconds * 1000L);
+
         
         return Jwts.builder()
                 .setClaims(claims)
