@@ -58,6 +58,35 @@ public class AuthController {
         }
     }
 
+    /**
+     * Verify endpoint for clients to validate a token.
+     * Returns 200 OK when token is valid, 401 when invalid/expired/missing.
+     */
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyToken(@RequestHeader(name = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authHeader.substring(7);
+        boolean valid = jwtUtil.validateToken(token);
+        if (!valid) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        // Optionally return subject (email) to the client
+        String subject = jwtUtil.getSubject(token);
+        // Try to look up the user by email and return the stored name when available
+        String name = null;
+        try {
+            var userOpt = userService.findByEmail(subject);
+            if (userOpt.isPresent()) {
+                name = userOpt.get().getName();
+            }
+        } catch (Exception e) {
+            // ignore and return subject only
+        }
+        return ResponseEntity.ok(new VerifyResponse(subject, name));
+    }
+
     // DTOs
     public static class RegisterRequest {
         public String name;
@@ -77,6 +106,16 @@ public class AuthController {
         public AuthResponse(String accessToken, String message) {
             this.accessToken = accessToken;
             this.message = message;
+        }
+    }
+
+    public static class VerifyResponse {
+        public String subject;
+        public String name;
+
+        public VerifyResponse(String subject, String name) {
+            this.subject = subject;
+            this.name = name;
         }
     }
 }

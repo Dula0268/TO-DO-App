@@ -116,6 +116,9 @@ public class SecurityConfig {
                 // Public endpoints - no authentication required
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
+                // Allow clients to call the token verification endpoint without being
+                // authenticated so it can return 401 when the token is missing/invalid
+                .requestMatchers("/api/auth/verify").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/public/**").permitAll()
                 
