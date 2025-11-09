@@ -1,5 +1,7 @@
 "use client";
 
+import FormError from "../../components/FormError";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -17,14 +19,23 @@ export default function RegisterForm() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirm?: string }>({});
+
+  // animated field error object
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirm?: string;
+  }>({});
 
   const validate = () => {
     const e: typeof errors = {};
+
     if (!name.trim()) e.name = "Full name is required";
 
     if (!email.trim()) e.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      e.email = "Enter a valid email";
 
     if (!password) e.password = "Password is required";
     else if (password.length < 6) e.password = "Use at least 6 characters";
@@ -42,12 +53,17 @@ export default function RegisterForm() {
 
     const id = toast.loading("Creating account…");
     setBusy(true);
+
     try {
       await apiRegister(name, email, password);
       toast.success("Registration successful. Please sign in.");
       router.push("/login");
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? err?.message ?? "Registration failed");
+      toast.error(
+        err?.response?.data?.message ??
+          err?.message ??
+          "Registration failed"
+      );
     } finally {
       toast.dismiss(id);
       setBusy(false);
@@ -56,6 +72,7 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+
       {/* Name */}
       <div>
         <input
@@ -64,11 +81,10 @@ export default function RegisterForm() {
           placeholder="Full name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="block w-full h-12 rounded-lg border border-gray-300 px-4 text-sm placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
-          aria-invalid={!!errors.name}
-          aria-describedby={errors.name ? "name-error" : undefined}
+          className="block w-full h-12 rounded-lg border border-gray-300 px-4 text-sm
+                     placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
         />
-        {errors.name && <p id="name-error" className="mt-1 text-sm text-red-600">{errors.name}</p>}
+        <FormError message={errors.name} />
       </div>
 
       {/* Email */}
@@ -80,11 +96,10 @@ export default function RegisterForm() {
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="block w-full h-12 rounded-lg border border-gray-300 px-4 text-sm placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
-          aria-invalid={!!errors.email}
-          aria-describedby={errors.email ? "email-error" : undefined}
+          className="block w-full h-12 rounded-lg border border-gray-300 px-4 text-sm
+                     placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
         />
-        {errors.email && <p id="email-error" className="mt-1 text-sm text-red-600">{errors.email}</p>}
+        <FormError message={errors.email} />
       </div>
 
       {/* Password */}
@@ -97,20 +112,20 @@ export default function RegisterForm() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full h-12 rounded-lg border border-gray-300 px-4 pr-12 text-sm placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
-            aria-invalid={!!errors.password}
-            aria-describedby={errors.password ? "password-error" : undefined}
+            className="block w-full h-12 rounded-lg border border-gray-300 px-4 pr-12 text-sm
+                       placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
           />
+
           <button
             type="button"
             onClick={() => setShowPwd((s) => !s)}
-            aria-label={showPwd ? "Hide password" : "Show password"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100"
           >
             {showPwd ? "Hide" : "Show"}
           </button>
         </div>
-        {errors.password && <p id="password-error" className="mt-1 text-sm text-red-600">{errors.password}</p>}
+
+        <FormError message={errors.password} />
       </div>
 
       {/* Confirm Password */}
@@ -123,20 +138,20 @@ export default function RegisterForm() {
             placeholder="Confirm password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="block w-full h-12 rounded-lg border border-gray-300 px-4 pr-12 text-sm placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
-            aria-invalid={!!errors.confirm}
-            aria-describedby={errors.confirm ? "confirm-error" : undefined}
+            className="block w-full h-12 rounded-lg border border-gray-300 px-4 pr-12 text-sm
+                       placeholder:text-gray-500 outline-purple-500 bg-white shadow-sm"
           />
+
           <button
             type="button"
             onClick={() => setShowConfirm((s) => !s)}
-            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100"
           >
             {showConfirm ? "Hide" : "Show"}
           </button>
         </div>
-        {errors.confirm && <p id="confirm-error" className="mt-1 text-sm text-red-600">{errors.confirm}</p>}
+
+        <FormError message={errors.confirm} />
       </div>
 
       {/* Submit */}
@@ -147,6 +162,7 @@ export default function RegisterForm() {
       >
         {busy ? "Creating account…" : "Register"}
       </button>
+
     </form>
   );
 }
