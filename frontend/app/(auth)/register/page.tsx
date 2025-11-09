@@ -1,157 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { register } from '@/app/lib/api';
+import RegisterForm from "@/app/(auth)/register/RegisterForm";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await register(name, email, password);
-      alert('Registration successful! Please login.');
-      router.push('/login');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          📝 Create Account
-        </h1>
+    <main className="relative min-h-screen bg-purple-400 flex items-center justify-center overflow-hidden">
+      {/* floating shapes (same as login) */}
+      <div className="absolute w-60 h-60 rounded-xl bg-purple-300 -top-5 -left-16 rotate-45 hidden md:block" />
+      <div className="absolute w-48 h-48 rounded-xl bg-purple-300 -bottom-6 -right-10 rotate-12 hidden md:block" />
+      <div className="absolute w-40 h-40 bg-purple-300 rounded-full top-0 right-12 hidden md:block" />
+      <div className="absolute w-20 h-40 bg-purple-300 rounded-full bottom-20 left-10 rotate-45 hidden md:block" />
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
+      {/* card */}
+      <section className="relative z-20 w-full max-w-lg">
+        <div className="bg-white rounded-2xl shadow-xl">
+          <header className="text-center px-8 pt-10">
+            <h1 className="text-3xl font-bold">Create an account</h1>
+            <p className="mt-2 text-sm font-semibold text-gray-700">
+              Join Todo App and start organizing
+            </p>
+          </header>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* Name */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            />
+          {/* inset content so inputs never touch the edge */}
+          <div className="px-8 md:px-12 py-10">
+            <RegisterForm />
           </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            />
-          </div>
-
-          {/* Password with icon */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-0.4 text-gray-600 text-xl"
-              >
-                {showPassword ? '👁️‍🗨️' : '👁️'}
-              </button>
-            </div>
-          </div>
-
-          {/* Confirm Password with icon */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-3 top-0.4 text-gray-600 text-xl"
-              >
-                {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
-              </button>
-            </div>
-          </div>
-
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? 'Creating Account...' : 'Register'}
-          </button>
-        </form>
-
-        <p className="text-center text-gray-600 mt-6">
-          Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline font-semibold">
-            Login here
-          </Link>
-        </p>
-      </div>
-    </div>
+          <footer className="px-8 md:px-12 pb-10 -mt-3">
+            <p className="text-center text-sm text-gray-700">
+              Already have an account?{" "}
+              <a href="/login" className="underline">Sign in</a>
+            </p>
+          </footer>
+        </div>
+      </section>
+    </main>
   );
 }
