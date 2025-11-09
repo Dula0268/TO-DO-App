@@ -181,8 +181,3 @@ See **SECURITY_GUIDE.md** for extra tips.
 
 For team‑wide dev parity, consider Docker Compose with services for `api`, `web`, and `db`. Add a `docker-compose.yml` and environment files; keep secrets out of VCS.
 
----
-
-## 📜 License
-
-MIT (or choose your preferred license)
