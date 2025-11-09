@@ -105,7 +105,19 @@ export default function TodoList({
   if (todos.length === 0) {
     return (
       <div className="bg-white p-8 rounded-lg shadow-md text-center text-gray-600">
-        <p>No todos yet. Create one to get started! 🎉</p>
+        <div className="flex flex-col items-center gap-4">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2h10zM9 3v4M15 3v4M7 7h10" />
+          </svg>
+          <p className="text-lg font-semibold">No todos yet</p>
+          <p className="text-sm text-gray-500">Add your first todo using the form on the left.</p>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
+          >
+            + Add Todo
+          </button>
+        </div>
       </div>
     );
   }
@@ -115,25 +127,34 @@ export default function TodoList({
 
   // Component to render a single todo item
   const TodoItem = ({ todo }: { todo: Todo }) => (
-    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex items-start gap-3">
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={() => handleToggle(todo)}
-        className="mt-1 w-5 h-5 text-blue-600 rounded"
-      />
+    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col sm:flex-row sm:items-start gap-3">
+      <div className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          checked={todo.completed}
+          onChange={() => handleToggle(todo)}
+          className="mt-1 w-5 h-5 text-blue-600 rounded"
+        />
+      </div>
 
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <h3
-            className={`font-semibold text-lg ${
-              todo.completed ? 'line-through text-gray-400' : 'text-gray-800'
-            }`}
-          >
-            {todo.title}
-          </h3>
-          {viewMode === 'flat' && <PriorityBadge priority={todo.priority} />}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 mb-1 justify-between">
+          <div className="flex items-center gap-2">
+            <h3
+              className={`font-semibold text-lg ${
+                todo.completed ? 'line-through text-gray-400' : 'text-gray-800'
+              }`}
+            >
+              {todo.title}
+            </h3>
+            {viewMode === 'flat' && <PriorityBadge priority={todo.priority} />}
+          </div>
+          <div className="mt-2 sm:mt-0 text-sm text-gray-500">
+            {/* Lightweight meta */}
+            <span># {todo.id}</span>
+          </div>
         </div>
+
         {todo.description && (
           <p className={todo.completed ? 'text-gray-300' : 'text-gray-600'}>
             {todo.description}
@@ -141,19 +162,19 @@ export default function TodoList({
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center mt-3 sm:mt-0">
         <button
           onClick={() => onEditClick(todo)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded transition"
+          className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-md transition"
         >
-          Edit
+          ✏️ Edit
         </button>
         <button
           onClick={() => handleDelete(todo.id)}
           disabled={deleting === todo.id}
-          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition disabled:opacity-50"
         >
-          {deleting === todo.id ? 'Deleting...' : 'Delete'}
+          {deleting === todo.id ? 'Deleting...' : '🗑️ Delete'}
         </button>
       </div>
     </div>

@@ -130,11 +130,11 @@ export default function TodoForm({
         </select>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition disabled:opacity-50"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition disabled:opacity-50 text-center"
         >
           {loading ? 'Saving...' : editingTodo?.id ? 'Update Todo' : 'Add Todo'}
         </button>
@@ -142,7 +142,7 @@ export default function TodoForm({
           <button
             type="button"
             onClick={onEditComplete}
-            className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition"
+            className="w-full sm:w-auto bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition"
           >
             Cancel
           </button>

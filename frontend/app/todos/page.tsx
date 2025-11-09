@@ -95,108 +95,115 @@ export default function TodosPage() {
     <PrivateRoute>
       <Navbar />
       <div className="min-h-screen bg-gray-100 py-8 px-4">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">My Todos</h1>
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-800 mb-6">My Todos</h1>
 
-          <TodoForm
-            onTodoAdded={handleTodoAdded}
-            editingTodo={editingTodo}
-            onEditComplete={() => setEditingTodo(null)}
-          />
-
-          {error && !loading && (
-            <div className="bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-6 border border-yellow-300">
-              <p className="font-semibold">⚠️ {error}</p>
-              <button
-                onClick={fetchTodos}
-                className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition"
-              >
-                {loading ? 'Fetching...' : 'Refresh'}
-              </button>
+          {/* Responsive layout: form on the left (1/3) and list on right (2/3) on md+ */}
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
+            <div className="md:col-span-1">
+              <TodoForm
+                onTodoAdded={handleTodoAdded}
+                editingTodo={editingTodo}
+                onEditComplete={() => setEditingTodo(null)}
+              />
             </div>
-          )}
 
-          {error && <div className="mb-4 text-red-600">{error}</div>}
-
-          {/* Filter Controls */}
-          {!loading && todos.length > 0 && (
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">🔍 Filters</h3>
-              <div className="flex flex-wrap gap-4">
-                {/* Priority Filter */}
-                <div className="flex-1 min-w-[200px]">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Priority
-                  </label>
-                  <select
-                    value={priorityFilter}
-                    onChange={(e) => setPriorityFilter(e.target.value as 'ALL' | Priority)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            <div className="md:col-span-2">
+              {error && !loading && (
+                <div className="bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-6 border border-yellow-300">
+                  <p className="font-semibold">⚠️ {error}</p>
+                  <button
+                    onClick={fetchTodos}
+                    className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition"
                   >
-                    <option value="ALL">All Priorities</option>
-                    <option value="HIGH">🔴 High</option>
-                    <option value="MEDIUM">🟡 Medium</option>
-                    <option value="LOW">🟢 Low</option>
-                  </select>
+                    {loading ? 'Fetching...' : 'Refresh'}
+                  </button>
                 </div>
+              )}
 
-                {/* Completed Filter */}
-                <div className="flex-1 min-w-[200px]">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Status
-                  </label>
-                  <select
-                    value={completedFilter}
-                    onChange={(e) => setCompletedFilter(e.target.value as 'ALL' | 'COMPLETED' | 'PENDING')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  >
-                    <option value="ALL">All Status</option>
-                    <option value="PENDING">⏳ Pending</option>
-                    <option value="COMPLETED">✅ Completed</option>
-                  </select>
-                </div>
+              {error && <div className="mb-4 text-red-600">{error}</div>}
 
-                {/* Reset Filters Button */}
-                {(priorityFilter !== 'ALL' || completedFilter !== 'ALL') && (
-                  <div className="flex items-end">
-                    <button
-                      onClick={() => {
-                        setPriorityFilter('ALL');
-                        setCompletedFilter('ALL');
-                      }}
-                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-md transition"
-                    >
-                      Clear Filters
-                    </button>
+              {/* Filter Controls */}
+              {!loading && todos.length > 0 && (
+                <div className="bg-white p-4 rounded-lg shadow mb-6">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">🔍 Filters</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {/* Priority Filter */}
+                    <div className="flex-1 min-w-[200px]">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Priority
+                      </label>
+                      <select
+                        value={priorityFilter}
+                        onChange={(e) => setPriorityFilter(e.target.value as 'ALL' | Priority)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      >
+                        <option value="ALL">All Priorities</option>
+                        <option value="HIGH">🔴 High</option>
+                        <option value="MEDIUM">🟡 Medium</option>
+                        <option value="LOW">🟢 Low</option>
+                      </select>
+                    </div>
+
+                    {/* Completed Filter */}
+                    <div className="flex-1 min-w-[200px]">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={completedFilter}
+                        onChange={(e) => setCompletedFilter(e.target.value as 'ALL' | 'COMPLETED' | 'PENDING')}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      >
+                        <option value="ALL">All Status</option>
+                        <option value="PENDING">⏳ Pending</option>
+                        <option value="COMPLETED">✅ Completed</option>
+                      </select>
+                    </div>
+
+                    {/* Reset Filters Button */}
+                    {(priorityFilter !== 'ALL' || completedFilter !== 'ALL') && (
+                      <div className="flex items-end">
+                        <button
+                          onClick={() => {
+                            setPriorityFilter('ALL');
+                            setCompletedFilter('ALL');
+                          }}
+                          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-md transition"
+                        >
+                          Clear Filters
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Filter Results Summary */}
-              <div className="mt-3 text-xs text-gray-500">
-                Showing <span className="font-semibold text-gray-700">{filteredTodos.length}</span> of{' '}
-                <span className="font-semibold text-gray-700">{todos.length}</span> todos
-              </div>
+                  {/* Filter Results Summary */}
+                  <div className="mt-3 text-xs text-gray-500">
+                    Showing <span className="font-semibold text-gray-700">{filteredTodos.length}</span> of{' '}
+                    <span className="font-semibold text-gray-700">{todos.length}</span> todos
+                  </div>
+                </div>
+              )}
+
+              {loading && (
+                <div className="space-y-4">
+                  <TodoSkeleton />
+                  <TodoSkeleton />
+                  <TodoSkeleton />
+                </div>
+              )}
+
+
+              {!loading && (
+                <TodoList
+                  todos={filteredTodos}
+                  onTodoDeleted={handleTodoAdded}
+                  onEditClick={handleEditClick}
+                  loading={loading}
+                />
+              )}
             </div>
-          )}
-
-          {loading && (
-            <div className="space-y-4">
-            <TodoSkeleton />
-            <TodoSkeleton />
-            <TodoSkeleton />
-            </div>
-      )}
-
-
-          {!loading && (
-            <TodoList
-              todos={filteredTodos}
-              onTodoDeleted={handleTodoAdded}
-              onEditClick={handleEditClick}
-              loading={loading}
-            />
-          )}
+          </div>
         </div>
       </div>
     </PrivateRoute>
