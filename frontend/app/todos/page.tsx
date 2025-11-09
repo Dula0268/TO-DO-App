@@ -25,7 +25,7 @@ export default function TodosPage() {
     setLoading(true);
     setError('');
     try {
-      // `getTodos()` returns an Axios response object. Extract `.data`
+      // getTodos() returns an Axios response object. Extract .data
       const resp: any = await getTodos();
   const data = resp?.data ?? resp;
   setTodos(Array.isArray(data) ? data : []);
@@ -106,7 +106,7 @@ export default function TodosPage() {
 
           {error && !loading && (
             <div className="bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-6 border border-yellow-300">
-              <p className="font-semibold">⚠️ {error}</p>
+              <p className="font-semibold">⚠ {error}</p>
               <button
                 onClick={fetchTodos}
                 className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition"
