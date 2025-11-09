@@ -5,10 +5,24 @@ import { addTodo, updateTodo } from '@/app/lib/api';
 import toast from 'react-hot-toast';
 import type { Todo } from '@/types/todo';
 
+// icons
+import { GoDotFill } from "react-icons/go";
+import { CgSpinner } from "react-icons/cg";
+
 interface TodoFormProps {
   onTodoAdded: () => void;
   editingTodo?: Todo | null;
   onEditComplete: () => void;
+}
+
+/** Small helper to color the priority dot */
+function priorityColor(p: 'LOW' | 'MEDIUM' | 'HIGH') {
+  switch (p) {
+    case 'LOW': return 'text-green-500';
+    case 'MEDIUM': return 'text-yellow-500';
+    case 'HIGH': return 'text-red-500';
+    default: return 'text-gray-400';
+  }
 }
 
 export default function TodoForm({
@@ -22,7 +36,7 @@ export default function TodoForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // ✅ FIX: Update form when editingTodo changes
+  // ✅ Update form when editingTodo changes
   useEffect(() => {
     if (editingTodo) {
       setTitle(editingTodo.title);
@@ -69,8 +83,9 @@ export default function TodoForm({
       }
       onTodoAdded();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save todo');
-      toast.error(err.response?.data?.message || 'Failed to save todo');
+      const msg = err?.response?.data?.message || 'Failed to save todo';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -119,25 +134,40 @@ export default function TodoForm({
         <label className="block text-gray-700 font-semibold mb-2">
           Priority <span className="text-red-500">*</span>
         </label>
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH')}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white"
-        >
-          <option value="LOW">🟢 Low</option>
-          <option value="MEDIUM">🟡 Medium</option>
-          <option value="HIGH">🔴 High</option>
-        </select>
+
+        {/* Wrapper to show a colored dot INSIDE the select (right side) */}
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            <GoDotFill
+              className={`text-xl ${priorityColor(priority)}`}
+              aria-hidden
+            />
+          </div>
+
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH')}
+            className="w-full pr-10 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white"
+            aria-label="Priority"
+          >
+            {/* NOTE: options can only contain text; icons are shown via the adornment above */}
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition disabled:opacity-50"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition disabled:opacity-50 inline-flex items-center gap-2"
         >
-          {loading ? 'Saving...' : editingTodo?.id ? 'Update Todo' : 'Add Todo'}
+          {loading && <CgSpinner className="animate-spin h-5 w-5" aria-hidden />}
+          {editingTodo?.id ? 'Update Todo' : 'Add Todo'}
         </button>
+
         {editingTodo?.id && (
           <button
             type="button"

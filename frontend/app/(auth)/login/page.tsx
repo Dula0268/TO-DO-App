@@ -1,144 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { login } from "@/app/lib/api";
+import LoginForm from "@/app/(auth)/login/LoginForm";
 
 export default function LoginPage() {
-  const router = useRouter();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await login(email, password);
-
-      const token =
-        response?.accessToken ??
-        response?.token ??
-        localStorage.getItem("token");
-
-      const user = response?.user ?? null;
-
-      if (token) localStorage.setItem("token", token);
-      if (user) localStorage.setItem("user", JSON.stringify(user));
-
-      router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          📝 Todo App
-        </h1>
+    <main className="relative min-h-screen bg-purple-400 flex items-center justify-center overflow-hidden">
+      {/* floating shapes */}
+      <div className="absolute w-60 h-60 rounded-xl bg-purple-300 -top-5 -left-16 rotate-45 hidden md:block" />
+      <div className="absolute w-48 h-48 rounded-xl bg-purple-300 -bottom-6 -right-10 rotate-12 hidden md:block" />
+      <div className="absolute w-40 h-40 bg-purple-300 rounded-full top-0 right-12 hidden md:block" />
+      <div className="absolute w-20 h-40 bg-purple-300 rounded-full bottom-20 left-10 rotate-45 hidden md:block" />
 
-        {/* Error Box */}
-        {error && (
-          <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
+      {/* card with BIG inner padding */}
+      <section className="relative z-20 w-full max-w-lg">
+        <div className="bg-white rounded-2xl shadow-xl">
+          <header className="text-center px-8 pt-10">
+            <h1 className="text-3xl font-bold">Welcome back</h1>
+            <p className="mt-2 text-sm font-semibold text-gray-700">
+              Sign in to continue to Todo App
+            </p>
+          </header>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Email
-            </label>
-
-            {loading ? (
-              <div className="animate-pulse h-10 rounded-lg bg-gray-200"></div>
-            ) : (
-              <input
-                type="email"
-                name="email"
-                autoComplete="username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              />
-            )}
+          {/* >>> this wrapper guarantees inputs don't kiss the edge <<< */}
+          <div className="px-8 md:px-12 py-10">
+            <LoginForm />
           </div>
 
-          {/* Password */}
-          <div>
-  <label className="block text-gray-700 font-semibold mb-2">
-    Password
-  </label>
-
-  {loading ? (
-    <div className="animate-pulse h-10 rounded-lg bg-gray-200"></div>
-  ) : (
-    <div className="relative">
-      <input
-        type={showPassword ? "text" : "password"}
-        name="password"
-        autoComplete="current-password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="••••••••"
-        required
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-      />
-
-      {/* Eye Icon Button */}
-      <button
-        type="button"
-        onClick={() => setShowPassword((prev) => !prev)}
-        className="absolute right-3 top-0.15 text-gray-600 text-xl"
-      >
-        {showPassword ? "👁️‍🗨️" : "👁️"}
-      </button>
-    </div>
-  )}
-</div>
-
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="animate-pulse h-5 bg-blue-400 rounded w-full"></div>
-            ) : (
-              "Login"
-            )}
-          </button>
-        </form>
-
-        {/* Footer */}
-        <p className="text-center text-gray-600 mt-6">
-          Don't have an account?{" "}
-          <Link
-            href="/register"
-            className="text-blue-600 hover:underline font-semibold"
-          >
-            Register here
-          </Link>
-        </p>
-      </div>
-    </div>
+          <footer className="px-8 md:px-12 pb-10 -mt-3">
+            <p className="text-center text-sm text-gray-700">
+              Don&apos;t have an account?{" "}
+              <a href="/register" className="underline">Create one now</a>
+            </p>
+          </footer>
+        </div>
+      </section>
+    </main>
   );
 }
