@@ -23,8 +23,8 @@ export default function Navbar() {
   const navClass = useMemo(
     () =>
       onAuthPage
-        ? 'fixed inset-x-0 top-0 z-40 bg-gradient-to-r from-indigo-500/90 to-purple-600/90 backdrop-blur text-white'
-        : 'sticky top-0 z-40 bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg',
+        ? 'fixed inset-x-0 top-0 z-40 bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 backdrop-blur-sm text-white shadow-2xl border-b border-white/20'
+        : 'sticky top-0 z-40 bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 text-white shadow-2xl border-b border-white/10',
     [onAuthPage]
   );
 
@@ -112,61 +112,62 @@ export default function Navbar() {
   return (
     <>
       <nav className={navClass}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-2xl font-bold tracking-tight group"
+              className="flex items-center gap-3 text-2xl font-bold tracking-tight group transition-all duration-300 hover:scale-105"
               aria-label="Go to home"
             >
-              <FaTasks className="text-white drop-shadow-md group-hover:scale-110 transition-transform" />
-              <span className="drop-shadow-sm">Todo App</span>
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/30 rounded-xl blur-md group-hover:blur-lg transition-all"></div>
+                <div className="relative bg-white/20 backdrop-blur-sm p-2.5 rounded-xl border border-white/30 group-hover:bg-white/30 transition-all shadow-lg">
+                  <FaTasks className="text-white text-2xl drop-shadow-lg" />
+                </div>
+              </div>
+              <span className="bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent drop-shadow-lg">
+                Todo App
+              </span>
             </button>
 
             {/* Right side controls */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <>
-                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                    <BsPersonCircle className="text-white/90 text-lg" />
-                    <span className="text-sm font-medium text-white/90">
+                  <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-lg hover:bg-white/20 transition-all">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-purple-300/50 rounded-full blur-sm"></div>
+                      <BsPersonCircle className="relative text-white text-xl drop-shadow-lg" />
+                    </div>
+                    <span className="text-sm font-semibold text-white drop-shadow-md">
                       {user?.name || 'User'}
                     </span>
                   </div>
 
                   <button
                     onClick={handleLogout}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition
-                      ${onAuthPage
-                        ? 'bg-white/20 hover:bg-white/30 text-white shadow-inner'
-                        : 'bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg'}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold transition-all duration-300 bg-white/20 hover:bg-white/30 text-white shadow-lg hover:shadow-xl border border-white/30 hover:scale-105 backdrop-blur-sm"
                   >
-                    <FiLogOut className="text-base" />
-                    Logout
+                    <FiLogOut className="text-lg" />
+                    <span>Logout</span>
                   </button>
                 </>
               ) : (
                 <>
                   <button
                     onClick={() => router.push('/login')}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium transition
-                      ${onAuthPage
-                        ? 'bg-white text-purple-600 hover:bg-gray-100 shadow'
-                        : 'bg-white text-blue-600 hover:bg-gray-100 shadow-sm hover:shadow-md'}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold transition-all duration-300 bg-white text-purple-600 hover:bg-purple-50 shadow-lg hover:shadow-xl hover:scale-105"
                   >
-                    <FiLogIn />
-                    Login
+                    <FiLogIn className="text-lg" />
+                    <span>Login</span>
                   </button>
                   <button
                     onClick={() => router.push('/register')}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium transition
-                      ${onAuthPage
-                        ? 'bg-white text-purple-600 hover:bg-gray-100 shadow'
-                        : 'bg-white text-blue-600 hover:bg-gray-100 shadow-sm hover:shadow-md'}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold transition-all duration-300 bg-white/20 hover:bg-white/30 text-white shadow-lg hover:shadow-xl border border-white/30 backdrop-blur-sm hover:scale-105"
                   >
-                    <FiUserPlus />
-                    Register
+                    <FiUserPlus className="text-lg" />
+                    <span>Register</span>
                   </button>
                 </>
               )}
@@ -176,7 +177,7 @@ export default function Navbar() {
       </nav>
 
       {/* Spacer for fixed transparent navbar */}
-      {onAuthPage && <div className="h-16" />}
+      {onAuthPage && <div className="h-20" />}
     </>
   );
 }

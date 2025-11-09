@@ -14,41 +14,23 @@ interface TodoListProps {
   loading: boolean;
 }
 
-// 🎨 priority badge
+/* badge */
 const PriorityBadge = ({ priority }: { priority: Priority }) => {
   const colors = {
-    LOW: {
-      bg: 'bg-green-100',
-      text: 'text-green-800',
-      border: 'border-green-300',
-      dot: 'text-green-500',
-    },
-    MEDIUM: {
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-800',
-      border: 'border-yellow-300',
-      dot: 'text-yellow-500',
-    },
-    HIGH: {
-      bg: 'bg-red-100',
-      text: 'text-red-800',
-      border: 'border-red-300',
-      dot: 'text-red-500',
-    },
+    LOW:    { bg: 'bg-linear-to-r from-green-100 to-green-50',  text: 'text-green-800',  border: 'border-green-300',  dot: 'text-green-500',  shadow: 'shadow-green-100'  },
+    MEDIUM: { bg: 'bg-linear-to-r from-yellow-100 to-yellow-50', text: 'text-yellow-800', border: 'border-yellow-300', dot: 'text-yellow-500', shadow: 'shadow-yellow-100' },
+    HIGH:   { bg: 'bg-linear-to-r from-red-100 to-red-50',    text: 'text-red-800',    border: 'border-red-300',    dot: 'text-red-500',    shadow: 'shadow-red-100'    },
   };
   const style = colors[priority] || colors.MEDIUM;
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style.bg} ${style.text} ${style.border}`}
-    >
-      <GoDotFill className={`${style.dot} text-sm`} aria-hidden />
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold shadow-sm ${style.bg} ${style.text} ${style.border}`}>
+      <GoDotFill className={`${style.dot} text-sm animate-pulse`} aria-hidden />
       <span>{priority}</span>
     </span>
   );
 };
 
-// group helper
 const groupTodosByPriority = (todos: Todo[]) => {
   const grouped = { HIGH: [] as Todo[], MEDIUM: [] as Todo[], LOW: [] as Todo[] };
   todos.forEach(todo => {
@@ -91,15 +73,15 @@ export default function TodoList({
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <CgSpinner className="animate-spin w-10 h-10 text-blue-600 mx-auto" />
+      <div className="py-8 text-center">
+        <CgSpinner className="mx-auto h-10 w-10 animate-spin text-blue-600" />
       </div>
     );
   }
 
   if (todos.length === 0) {
     return (
-      <div className="bg-white p-8 rounded-lg shadow-md text-center text-gray-600">
+      <div className="rounded-xl bg-white p-8 text-center text-gray-600 shadow ring-1 ring-gray-200">
         <p>No todos yet. Create one to get started!</p>
       </div>
     );
@@ -108,38 +90,31 @@ export default function TodoList({
   const groupedTodos = groupTodosByPriority(todos);
   const priorityOrder: Priority[] = ['HIGH', 'MEDIUM', 'LOW'];
 
-  // 🧩 each card gets a soft color tint
+  // soft colored cards per priority + subtle ring
   const cardColor = (priority: Priority) => {
     switch (priority) {
-      case 'HIGH':
-        return 'bg-red-50 hover:bg-red-100';
-      case 'MEDIUM':
-        return 'bg-yellow-50 hover:bg-yellow-100';
-      case 'LOW':
-        return 'bg-green-50 hover:bg-green-100';
-      default:
-        return 'bg-white hover:bg-gray-50';
+      case 'HIGH':   return 'bg-gradient-to-br from-red-50 to-white hover:from-red-100 hover:to-red-50 ring-red-200 border-l-4 border-red-400';
+      case 'MEDIUM': return 'bg-gradient-to-br from-yellow-50 to-white hover:from-yellow-100 hover:to-yellow-50 ring-yellow-200 border-l-4 border-yellow-400';
+      case 'LOW':    return 'bg-gradient-to-br from-green-50 to-white hover:from-green-100 hover:to-green-50 ring-green-200 border-l-4 border-green-400';
+      default:       return 'bg-gradient-to-br from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 ring-gray-200 border-l-4 border-gray-400';
     }
   };
 
-  // Todo item
   const TodoItem = ({ todo }: { todo: Todo }) => (
     <div
-      className={`${cardColor(
-        todo.priority
-      )} p-4 rounded-lg shadow-sm hover:shadow-md transition flex items-start gap-3`}
+      className={`flex items-start gap-4 rounded-xl p-5 shadow-md ring-1 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${cardColor(todo.priority)}`}
     >
       <input
         type="checkbox"
         checked={todo.completed}
         onChange={() => handleToggle(todo)}
-        className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-400"
+        className="mt-1.5 h-6 w-6 rounded-md border-2 border-purple-300 text-purple-600 focus:ring-2 focus:ring-purple-400 transition-all cursor-pointer hover:scale-110"
       />
 
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <h3
-            className={`font-semibold text-lg ${
+            className={`text-lg font-bold ${
               todo.completed ? 'line-through text-gray-400' : 'text-gray-800'
             }`}
           >
@@ -148,44 +123,49 @@ export default function TodoList({
           {viewMode === 'flat' && <PriorityBadge priority={todo.priority} />}
         </div>
         {todo.description && (
-          <p
-            className={`text-sm ${
-              todo.completed ? 'text-gray-300' : 'text-gray-600'
-            }`}
-          >
+          <p className={`text-sm leading-relaxed ${todo.completed ? 'text-gray-400 italic' : 'text-gray-600'}`}>
             {todo.description}
           </p>
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 shrink-0">
         <button
           onClick={() => onEditClick(todo)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded transition"
+          className="group rounded-lg bg-linear-to-r from-yellow-500 to-orange-500 px-4 py-2 text-sm font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105 hover:from-yellow-600 hover:to-orange-600"
         >
-          Edit
+          <span className="flex items-center gap-1">
+            ✏️ <span className="hidden sm:inline">Edit</span>
+          </span>
         </button>
         <button
           onClick={() => handleDelete(todo.id)}
           disabled={deleting === todo.id}
-          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded transition disabled:opacity-50"
+          className="group rounded-lg bg-linear-to-r from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105 hover:from-red-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {deleting === todo.id ? '...' : 'Delete'}
+          <span className="flex items-center gap-1">
+            {deleting === todo.id ? '⏳' : '🗑️'} <span className="hidden sm:inline">{deleting === todo.id ? '...' : 'Delete'}</span>
+          </span>
         </button>
       </div>
     </div>
   );
 
   return (
-    <div>
+    <div className="space-y-8">
       {/* Header + toggle */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
-          My Todos ({todos.length})
-        </h2>
+      <div className="flex items-center justify-between pb-6 border-b-2 border-linear-to-r from-purple-200 to-pink-200">
+        <div>
+          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-pink-600 drop-shadow-sm">
+            My Todos
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            You have <span className="font-bold text-purple-600">{todos.length}</span> {todos.length === 1 ? 'todo' : 'todos'}
+          </p>
+        </div>
         <button
           onClick={() => setViewMode(viewMode === 'flat' ? 'grouped' : 'flat')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+          className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-purple-600 via-purple-500 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 hover:from-purple-700 hover:via-purple-600 hover:to-indigo-700"
         >
           {viewMode === 'flat' ? (
             <>
@@ -202,26 +182,30 @@ export default function TodoList({
       </div>
 
       {viewMode === 'grouped' ? (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {priorityOrder.map(priority => {
             const todosInGroup = groupedTodos[priority];
             if (todosInGroup.length === 0) return null;
 
+            // colored group header underline
+            const underline =
+              priority === 'HIGH' ? 'border-red-200' :
+              priority === 'MEDIUM' ? 'border-yellow-200' :
+              'border-green-200';
+
             return (
-              <div key={priority}>
-                {/* Group Header */}
-                <div className="flex items-center gap-3 mb-3 pb-2 border-b border-gray-200">
+              <div key={priority} className="space-y-4">
+                <div className={`flex items-center gap-3 border-b-2 pb-4 ${underline}`}>
                   <PriorityBadge priority={priority} />
-                  <h3 className="text-lg font-semibold text-gray-700">
+                  <h3 className="text-xl font-extrabold text-gray-800">
                     {priority} Priority
                   </h3>
-                  <span className="text-sm text-gray-500 font-medium">
-                    ({todosInGroup.length}{' '}
-                    {todosInGroup.length === 1 ? 'todo' : 'todos'})
+                  <span className="ml-auto text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    {todosInGroup.length} {todosInGroup.length === 1 ? 'todo' : 'todos'}
                   </span>
                 </div>
 
-                <div className="space-y-3 pl-2">
+                <div className="space-y-4">
                   {todosInGroup.map(todo => (
                     <TodoItem key={todo.id} todo={todo} />
                   ))}
@@ -231,7 +215,7 @@ export default function TodoList({
           })}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {todos.map(todo => (
             <TodoItem key={todo.id} todo={todo} />
           ))}
