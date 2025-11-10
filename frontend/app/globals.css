@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* 🌞 Light/Dark Theme Variables */
+:root {
+  /* Light theme colors */
+  --bg-color: #ffffff;
+  --text-color: #111827;
+  --card-bg: #f9fafb;
+  --accent-color: #2563eb;
+}
+
+[data-theme="dark"] {
+  /* Dark theme colors */
+  --bg-color: #111827;
+  --text-color: #f9fafb;
+  --card-bg: #1f2937;
+  --accent-color: #3b82f6;
+}
+
+/* Apply variables globally */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* (optional) your skeleton class — keep a single version only */
 @keyframes shimmer {
   0% { background-position: -1000px 0; }
