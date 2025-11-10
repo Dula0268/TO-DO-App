@@ -1,5 +1,6 @@
 package com.todoapp.backend.controller;
 
+import com.todoapp.backend.dto.ApiResponse;
 import com.todoapp.backend.model.User;
 import com.todoapp.backend.security.JwtUtil;
 import com.todoapp.backend.service.UserService;
@@ -29,32 +30,43 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest req) {
         if (req == null || req.email == null || req.password == null) {
-            return ResponseEntity.badRequest().body(new AuthResponse(null, "Invalid request"));
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>("Invalid request", null, HttpStatus.BAD_REQUEST.value()));
         }
+
         try {
             User u = userService.register(req.name, req.email, req.password);
             String token = jwtUtil.generateToken(u.getEmail());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token, "Registered"));
+            AuthResponse data = new AuthResponse(token, "Registered");
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse<>("User registered successfully", data, HttpStatus.CREATED.value()));
+
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse(null, ex.getMessage()));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponse<>(ex.getMessage(), null, HttpStatus.CONFLICT.value()));
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest req) {
         if (req == null || req.email == null || req.password == null) {
-            return ResponseEntity.badRequest().body(new AuthResponse(null, "Invalid request"));
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>("Invalid request", null, HttpStatus.BAD_REQUEST.value()));
         }
+
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.email, req.password)
             );
             String token = jwtUtil.generateToken(auth.getName());
-            return ResponseEntity.ok(new AuthResponse(token, "OK"));
+            AuthResponse data = new AuthResponse(token, "OK");
+            return ResponseEntity.ok(new ApiResponse<>("Login successful", data, HttpStatus.OK.value()));
+
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid credentials"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>("Invalid credentials", null, HttpStatus.UNAUTHORIZED.value()));
         }
     }
 
@@ -63,28 +75,36 @@ public class AuthController {
      * Returns 200 OK when token is valid, 401 when invalid/expired/missing.
      */
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyToken(@RequestHeader(name = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<ApiResponse<VerifyResponse>> verifyToken(
+            @RequestHeader(name = "Authorization", required = false) String authHeader) {
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>("Missing or invalid token", null, HttpStatus.UNAUTHORIZED.value()));
         }
+
         String token = authHeader.substring(7);
         boolean valid = jwtUtil.validateToken(token);
+
         if (!valid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>("Invalid or expired token", null, HttpStatus.UNAUTHORIZED.value()));
         }
-        // Optionally return subject (email) to the client
+
         String subject = jwtUtil.getSubject(token);
-        // Try to look up the user by email and return the stored name when available
         String name = null;
+
         try {
             var userOpt = userService.findByEmail(subject);
             if (userOpt.isPresent()) {
                 name = userOpt.get().getName();
             }
         } catch (Exception e) {
-            // ignore and return subject only
+            // Ignore and continue
         }
-        return ResponseEntity.ok(new VerifyResponse(subject, name));
+
+        VerifyResponse data = new VerifyResponse(subject, name);
+        return ResponseEntity.ok(new ApiResponse<>("Token verified successfully", data, HttpStatus.OK.value()));
     }
 
     // DTOs
