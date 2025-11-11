@@ -23,13 +23,13 @@ export default function Navbar() {
 
   useEffect(() => {
     const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     setTheme(savedTheme);
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
     localStorage.setItem('theme', newTheme);
     setTheme(newTheme);
   };
