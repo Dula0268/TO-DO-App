@@ -1,22 +1,70 @@
 @import "tailwindcss";
 
-/* 🌞 Light/Dark Theme Variables */
 :root {
   --bg-color: #ffffff;
+  --surface-color: #f9fafb;
   --text-color: #111827;
+  --link-color: #6d28d9;
+  --card-bg: #ffffff;
+  --border-color: #e5e7eb;
 }
 
 .dark {
-  --bg-color: #121212;
+  --bg-color: #0f0f15;
+  --surface-color: #1c1b29;
   --text-color: #f3f4f6;
+  --link-color: #a78bfa;
+  --card-bg: #1e1e2f;
+  --border-color: #2d2d44;
 }
 
+/* Apply globally */
 html, body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
+a {
+  color: var(--link-color);
+  transition: color 0.3s ease;
+}
+
+/* Example reusable classes */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--link-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  border: 1px solid var(--link-color);
+  color: var(--link-color);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--link-color);
+  color: white;
+}
 
 /* (optional) your skeleton class — keep a single version only */
 @keyframes shimmer {
