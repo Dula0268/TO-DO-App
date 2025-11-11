@@ -4,8 +4,20 @@ export default {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class', // Enables dark mode toggle via class
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: {
+          light: '#ffffff',
+          dark: '#121212',
+        },
+        text: {
+          light: '#000000',
+          dark: '#ffffff',
+        },
+      },
+    },
   },
   plugins: [],
 };
