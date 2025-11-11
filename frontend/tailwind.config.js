@@ -1,20 +1,25 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class', // Enables dark mode toggle via class
   theme: {
     extend: {
       colors: {
-        background: {
+        primary: {
+          light: '#a78bfa', // light purple
+          DEFAULT: '#8b5cf6', // main purple
+          dark: '#6d28d9', // darker purple
+        },
+        surface: {
           light: '#ffffff',
-          dark: '#121212',
+          dark: '#1e1e2f',
         },
         text: {
-          light: '#000000',
-          dark: '#ffffff',
+          light: '#111827',
+          dark: '#f3f4f6',
         },
       },
     },
