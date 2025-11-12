@@ -1,5 +1,7 @@
 "use client";
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { AiOutlineExclamationCircle, AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
+import { createPortal } from 'react-dom';
 // todoAPI import removed since we're using mock data for now
 
 export default function TodoList() {
@@ -10,11 +12,28 @@ export default function TodoList() {
   ]);
 
   // DELETE FUNCTIONALITY - YOUR MAIN TASK
-  const handleDelete = async (todoId) => {
-    // Confirmation popup
-    if (!window.confirm('Are you sure you want to delete this todo?')) {
-      return;
+  const [confirmState, setConfirmState] = useState({ visible: false, message: '' });
+  const confirmResolve = useRef(null);
+
+  const showConfirmToast = (message) => {
+    return new Promise((resolve) => {
+      confirmResolve.current = resolve;
+      setConfirmState({ visible: true, message });
+    });
+  };
+
+  const closeConfirm = (result) => {
+    setConfirmState({ visible: false, message: '' });
+    if (confirmResolve.current) {
+      confirmResolve.current(result);
+      confirmResolve.current = null;
     }
+  };
+
+  const handleDelete = async (todoId) => {
+    // Confirmation popup (center of page)
+    const confirmed = await showConfirmToast('Are you sure you want to delete this todo?');
+    if (!confirmed) return;
 
     try {
       // MOCK SUCCESS - Remove this when backend is ready
@@ -36,8 +55,35 @@ export default function TodoList() {
     }
   };
 
+  // Portal-mounted confirm modal so it always centers on the viewport
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
+  const ConfirmModal = (confirmState.visible && portalTarget)
+    ? createPortal(
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/30" onClick={() => closeConfirm(false)} />
+        <div className="relative bg-white rounded-lg p-5 shadow-lg w-full max-w-sm mx-4">
+          <div className="flex items-start gap-3">
+            <AiOutlineExclamationCircle className="text-2xl text-yellow-500 mt-1" />
+            <div className="flex-1">
+              <p className="text-sm text-gray-800">{confirmState.message}</p>
+              <div className="mt-4 flex justify-end gap-2">
+                <button onClick={() => closeConfirm(false)} className="inline-flex items-center gap-2 px-3 py-1 rounded bg-gray-100">Cancel <AiOutlineClose /></button>
+                <button onClick={() => closeConfirm(true)} className="inline-flex items-center gap-2 px-3 py-1 rounded bg-red-500 text-white">Delete <AiOutlineCheck /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>,
+      portalTarget
+    )
+    : null;
+
+  // (Removed duplicate toast-based confirm - using portal modal implementation above)
+
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <>
+      {ConfirmModal}
+      <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-3xl font-bold text-center mb-8">My Todo List</h1>
       
       {todos.length === 0 ? (
@@ -78,6 +124,7 @@ export default function TodoList() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
