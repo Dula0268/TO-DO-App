@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { deleteTodo, toggleTodo } from '@/app/lib/api';
 import type { Todo, Priority } from '@/types/todo';
 import { GoDotFill } from "react-icons/go";
 import { MdViewList, MdOutlineStackedBarChart } from "react-icons/md";
 import { CgSpinner } from "react-icons/cg";
 import toast from "react-hot-toast";
+import { AiOutlineExclamationCircle, AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
+import { createPortal } from 'react-dom';
 
 interface TodoListProps {
   todos: Todo[];
@@ -44,8 +46,27 @@ export default function TodoList({ todos, onTodoDeleted, onEditClick, loading }:
   const [deleting, setDeleting] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'flat' | 'grouped'>('grouped');
 
+  const [confirmState, setConfirmState] = useState<{ visible: boolean; message: string }>({ visible: false, message: '' });
+  const confirmResolve = useRef<((value: boolean) => void) | null>(null);
+
+  const showConfirmToast = (message: string) => {
+    return new Promise<boolean>((resolve) => {
+      confirmResolve.current = resolve;
+      setConfirmState({ visible: true, message });
+    });
+  };
+
+  const closeConfirm = (result: boolean) => {
+    setConfirmState({ visible: false, message: '' });
+    if (confirmResolve.current) {
+      confirmResolve.current(result);
+      confirmResolve.current = null;
+    }
+  };
+
   const handleDelete = async (id: number) => {
-    if (!window.confirm('🗑 Are you sure you want to delete this todo?')) return;
+    const confirmed = await showConfirmToast('🗑 Are you sure you want to delete this todo?');
+    if (!confirmed) return;
     setDeleting(id);
     try {
       await deleteTodo(id);
@@ -57,6 +78,41 @@ export default function TodoList({ todos, onTodoDeleted, onEditClick, loading }:
       setDeleting(null);
     }
   };
+
+  // Portal-mounted confirm modal so it always centers on the viewport
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
+  const ConfirmModal = (confirmState.visible && portalTarget)
+    ? createPortal(
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/30" onClick={() => closeConfirm(false)} />
+        <div className="relative bg-white rounded-xl p-6 shadow-lg w-full max-w-md mx-4">
+          <div className="flex items-start gap-4">
+            <AiOutlineExclamationCircle className="text-3xl text-yellow-500 mt-1" />
+            <div className="flex-1">
+              <p className="text-sm text-gray-800">{confirmState.message}</p>
+              <div className="mt-4 flex justify-end gap-3">
+                <button
+                  onClick={() => closeConfirm(false)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-gray-100 text-sm font-medium"
+                >
+                  <AiOutlineClose />
+                  Cancel
+                </button>
+                <button
+                  onClick={() => closeConfirm(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-red-500 text-white text-sm font-bold"
+                >
+                  <AiOutlineCheck />
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>,
+      portalTarget
+    )
+    : null;
 
   const handleToggle = async (todo: Todo) => {
     try {
@@ -123,7 +179,9 @@ export default function TodoList({ todos, onTodoDeleted, onEditClick, loading }:
   );
 
   return (
-    <div className="space-y-8">
+    <>
+      {ConfirmModal}
+      <div className="space-y-8">
       <div className="flex items-center justify-between pb-6 border-b-2 border-linear-to-r from-purple-200 to-pink-200">
         <div>
           <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-pink-600">My Todos</h2>
@@ -166,6 +224,7 @@ export default function TodoList({ todos, onTodoDeleted, onEditClick, loading }:
       ) : (
         <div className="space-y-4">{todos.map(todo => <TodoItem key={todo.id} todo={todo} />)}</div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
