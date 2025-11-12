@@ -27,6 +27,41 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/*
+          Inline early script: some browser extensions (e.g. CRX launchers) inject
+          attributes onto the <html> element (example: `crxlauncher=""`). That
+          causes React hydration mismatch warnings because the server HTML
+          doesn't contain those attributes. This tiny inline script removes any
+          such extension-prefixed attributes from the root element before React
+          hydrates. It's a defensive, low-risk dev-time fix to reduce noisy
+          hydration errors coming from extensions.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              try {
+                const root = document && document.documentElement;
+                if (!root || !root.attributes) return;
+                // Remove a known attribute and any attributes that look like
+                // extension-injected (start with 'crx' or 'ext-')
+                const toRemove = [];
+                for (let i = 0; i < root.attributes.length; i++) {
+                  const name = root.attributes[i].name;
+                  if (
+                    name === 'crxlauncher' ||
+                    name.startsWith('crx') ||
+                    name.startsWith('ext-')
+                  ) {
+                    toRemove.push(name);
+                  }
+                }
+                toRemove.forEach(n => root.removeAttribute(n));
+              } catch (e) {
+                // ignore safe-fail
+              }
+            })();`,
+          }}
+        />
         <Navbar />   {/* now visible on login/register/todos/etc. */}
         {children}
         <Toaster position="top-right" />

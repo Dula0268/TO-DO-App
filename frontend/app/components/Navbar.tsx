@@ -2,9 +2,9 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { FaTasks } from 'react-icons/fa'; // app logo icon
-import { FiLogIn, FiUserPlus, FiLogOut } from 'react-icons/fi'; // auth icons
-import { BsPersonCircle } from 'react-icons/bs'; // user avatar
+import { FaTasks } from 'react-icons/fa';
+import { FiLogIn, FiUserPlus, FiLogOut } from 'react-icons/fi';
+import { BsPersonCircle } from 'react-icons/bs';
 
 interface User {
   name?: string;
@@ -17,6 +17,22 @@ export default function Navbar() {
 
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  /** 🌙 Theme state */
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    setTheme(savedTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+    setTheme(newTheme);
+  };
 
   // Transparent navbar for auth pages
   const onAuthPage = pathname === '/login' || pathname === '/register';
@@ -133,6 +149,16 @@ export default function Navbar() {
 
             {/* Right side controls */}
             <div className="flex items-center gap-4">
+              {/* 🌙 Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-full border border-white/30 bg-white/20 hover:bg-white/30 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                aria-label="Toggle theme"
+                title="Toggle light/dark mode"
+              >
+                {theme === 'light' ? '🌙' : '☀️'}
+              </button>
+
               {isAuthenticated ? (
                 <>
                   <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-lg hover:bg-white/20 transition-all">
