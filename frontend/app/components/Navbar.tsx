@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { FaTasks } from 'react-icons/fa';
 import { FiLogIn, FiUserPlus, FiLogOut } from 'react-icons/fi';
 import { BsPersonCircle } from 'react-icons/bs';
+import { BsMoon, BsSun } from "react-icons/bs";
+
 
 interface User {
   name?: string;
@@ -150,14 +152,19 @@ export default function Navbar() {
             {/* Right side controls */}
             <div className="flex items-center gap-4">
               {/* 🌙 Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className="p-2.5 rounded-full border border-white/30 bg-white/20 hover:bg-white/30 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
-                aria-label="Toggle theme"
-                title="Toggle light/dark mode"
-              >
-                {theme === 'light' ? '🌙' : '☀️'}
-              </button>
+                <button
+                  onClick={toggleTheme}
+                  className="p-2.5 rounded-full border border-white/30 bg-white/20 hover:bg-white/30 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                  aria-label="Toggle theme"
+                  title="Toggle light/dark mode"
+                >
+                  {theme === 'light' ? (
+                    <BsMoon className="text-xl text-white" />
+                  ) : (
+                    <BsSun className="text-xl text-yellow-300" />
+                  )}
+                </button>
+
 
               {isAuthenticated ? (
                 <>
