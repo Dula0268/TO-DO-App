@@ -9,12 +9,15 @@ import TodoForm from "@/app/components/TodoForm";
 import TodoSkeleton from "@/components/TodoSkeleton";
 import Footer from "@/app/components/Footer";
 
+
+
 // react-icons
 import { GoDotFill } from "react-icons/go";
 import { MdOutlineSearch, MdRefresh, MdWarningAmber } from "react-icons/md";
 import { MdPendingActions } from "react-icons/md";
 import { HiCheckCircle } from "react-icons/hi";
 import { TbChecklist } from "react-icons/tb";
+import { AiOutlineUnorderedList } from "react-icons/ai";
 
 export default function TodosPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -249,9 +252,13 @@ export default function TodosPage() {
                 {/* Todo List Card */}
                 <div className="bg-white rounded-2xl shadow-xl">
                   <div className="px-8 md:px-10 py-8">
-                    <h3 className="mb-6 text-xl font-bold text-gray-800">
+                    <h3 className="mb-6 flex items-center gap-2 text-xl font-bold text-gray-800">
+                      <AiOutlineUnorderedList className="text-2xl text-current" />
                       {loading ? 'Loading...' : 'My Todos'}
                     </h3>
+
+
+
 
                     {/* Loading */}
                     {loading && (

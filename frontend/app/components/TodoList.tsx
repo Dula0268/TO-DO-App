@@ -156,9 +156,6 @@ export default function TodoList({
       {/* Header + toggle */}
       <div className="flex items-center justify-between pb-6 border-b-2 border-linear-to-r from-purple-200 to-pink-200">
         <div>
-          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-pink-600 drop-shadow-sm">
-            My Todos
-          </h2>
           <p className="text-sm text-gray-500 mt-1">
             You have <span className="font-bold text-purple-600">{todos.length}</span> {todos.length === 1 ? 'todo' : 'todos'}
           </p>
